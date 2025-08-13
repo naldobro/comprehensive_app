@@ -17,7 +17,6 @@ import { CreateTopicForm } from './components/CreateTopicForm';
 import { CreateTaskForm } from './components/CreateTaskForm';
 import { QuickStatsBar } from './components/QuickStatsBar';
 import { ProductivityInsights } from './components/ProductivityInsights';
-import { ConnectionTest } from './components/ConnectionTest';
 import { Target, CheckSquare, Clock, Archive, BarChart3 } from 'lucide-react';
 import { getCurrentTimeContext, calculateTimePosition } from './utils/timeCalculations';
 
@@ -779,7 +778,6 @@ function App() {
         {/* Header */}
         <div className="mb-8">
           <ErrorBanner />
-          <ConnectionTest />
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
             <Target className="text-blue-600" size={32} />
