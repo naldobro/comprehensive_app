@@ -63,6 +63,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({
   };
 
   const colorScheme = getTopicColor(parseInt(topic.color));
+  
   const IconComponent = iconMap[topic.icon as keyof typeof iconMap] || Target;
 
   return (

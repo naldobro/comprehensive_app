@@ -1,5 +1,5 @@
 /*
-  # Complete TaskFlow Database Schema
+  # Complete TaskFlow Database Schema (Corrected)
 
   1. New Tables
     - `topics` - Stores all topic information with metadata
@@ -34,13 +34,12 @@ CREATE TABLE IF NOT EXISTS topics (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Tasks table
+-- Tasks table (no milestone_id foreign key)
 CREATE TABLE IF NOT EXISTS tasks (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   title text NOT NULL,
   description text NOT NULL DEFAULT '',
   topic_id uuid NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
-  milestone_id uuid,
   completed boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   completed_at timestamptz,
@@ -85,10 +84,6 @@ CREATE TABLE IF NOT EXISTS done_task_records (
   completed_at timestamptz NOT NULL,
   archived_date timestamptz NOT NULL DEFAULT now()
 );
-
--- Add foreign key reference for milestone_id in tasks
-ALTER TABLE tasks ADD CONSTRAINT fk_tasks_milestone 
-  FOREIGN KEY (milestone_id) REFERENCES milestones(id) ON DELETE SET NULL;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_tasks_topic_id ON tasks(topic_id);

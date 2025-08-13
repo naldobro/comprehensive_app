@@ -15,6 +15,8 @@ export const topicService = {
       return data.map(topic => ({
         ...topic,
         createdAt: new Date(topic.created_at),
+        // Ensure color is always a string
+        color: topic.color || '0',
       }));
     } catch (error) {
       handleSupabaseError(error, 'fetch topics');
@@ -107,7 +109,7 @@ export const taskService = {
       return data.map(task => ({
         ...task,
         topicId: task.topic_id,
-        milestoneId: task.milestone_id,
+        milestoneId: task.milestone_id || null,
         createdAt: new Date(task.created_at),
         completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
         completionMonth: task.completion_month,
@@ -128,7 +130,7 @@ export const taskService = {
           title: task.title,
           description: task.description,
           topic_id: task.topicId,
-          milestone_id: task.milestoneId,
+          milestone_id: task.milestoneId || null,
           completed: task.completed,
           completed_at: task.completedAt?.toISOString(),
           completion_month: task.completionMonth,
@@ -143,7 +145,7 @@ export const taskService = {
       return {
         ...data,
         topicId: data.topic_id,
-        milestoneId: data.milestone_id,
+        milestoneId: data.milestone_id || null,
         createdAt: new Date(data.created_at),
         completedAt: data.completed_at ? new Date(data.completed_at) : undefined,
         completionMonth: data.completion_month,
@@ -162,7 +164,7 @@ export const taskService = {
       if (updates.title !== undefined) updateData.title = updates.title;
       if (updates.description !== undefined) updateData.description = updates.description;
       if (updates.topicId !== undefined) updateData.topic_id = updates.topicId;
-      if (updates.milestoneId !== undefined) updateData.milestone_id = updates.milestoneId;
+      if (updates.milestoneId !== undefined) updateData.milestone_id = updates.milestoneId || null;
       if (updates.completed !== undefined) updateData.completed = updates.completed;
       if (updates.completedAt !== undefined) updateData.completed_at = updates.completedAt?.toISOString();
       if (updates.completionMonth !== undefined) updateData.completion_month = updates.completionMonth;
@@ -181,7 +183,7 @@ export const taskService = {
       return {
         ...data,
         topicId: data.topic_id,
-        milestoneId: data.milestone_id,
+        milestoneId: data.milestone_id || null,
         createdAt: new Date(data.created_at),
         completedAt: data.completed_at ? new Date(data.completed_at) : undefined,
         completionMonth: data.completion_month,

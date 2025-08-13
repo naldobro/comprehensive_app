@@ -17,6 +17,7 @@ import { CreateTopicForm } from './components/CreateTopicForm';
 import { CreateTaskForm } from './components/CreateTaskForm';
 import { QuickStatsBar } from './components/QuickStatsBar';
 import { ProductivityInsights } from './components/ProductivityInsights';
+import { ConnectionTest } from './components/ConnectionTest';
 import { Target, CheckSquare, Clock, Archive, BarChart3 } from 'lucide-react';
 import { getCurrentTimeContext, calculateTimePosition } from './utils/timeCalculations';
 
@@ -576,6 +577,19 @@ function App() {
     );
   };
 
+  // Add error boundary for color scheme issues
+  React.useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      if (event.message.includes("Cannot read properties of undefined (reading 'bg')")) {
+        console.error('Color scheme error detected, this might be due to invalid topic data');
+        setError('There was an issue with topic colors. Please refresh the page.');
+      }
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
   // Loading state
   if (loading) {
     return (
@@ -757,6 +771,7 @@ function App() {
         {/* Header */}
         <div className="mb-8">
           <ErrorBanner />
+          <ConnectionTest />
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
             <Target className="text-blue-600" size={32} />

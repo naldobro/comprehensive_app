@@ -47,7 +47,6 @@ export interface Database {
           title: string
           description: string
           topic_id: string
-          milestone_id: string | null
           completed: boolean
           created_at: string
           completed_at: string | null
@@ -61,7 +60,6 @@ export interface Database {
           title: string
           description?: string
           topic_id: string
-          milestone_id?: string | null
           completed?: boolean
           created_at?: string
           completed_at?: string | null
@@ -75,7 +73,6 @@ export interface Database {
           title?: string
           description?: string
           topic_id?: string
-          milestone_id?: string | null
           completed?: boolean
           created_at?: string
           completed_at?: string | null

@@ -24,7 +24,7 @@ export interface Task {
   title: string;
   description: string;
   topicId: string;
-  milestoneId?: string;
+  milestoneId?: string | null;
   completed: boolean;
   createdAt: Date;
   completedAt?: Date;
