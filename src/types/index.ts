@@ -58,6 +58,7 @@ export interface UndoRedoState {
 
 export interface StaleTaskRecord {
   id: string;
+  originalTaskId?: string;
   title: string;
   topicId: string;
   topicName: string;
@@ -67,6 +68,7 @@ export interface StaleTaskRecord {
 
 export interface DoneTaskRecord {
   id: string;
+  originalTaskId?: string;
   title: string;
   topicId: string;
   topicName: string;

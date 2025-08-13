@@ -131,7 +131,6 @@ function App() {
             const staleRecordPromises = tasksToMoveToStale.map(async (task) => {
               const topic = topics.find(t => t.id === task.topicId);
               const staleRecord = {
-                id: task.id,
                 title: task.title,
                 topicId: task.topicId,
                 topicName: topic?.name || 'Unknown Topic',
@@ -189,7 +188,6 @@ function App() {
             const doneRecordPromises = tasksToMoveToDone.map(async (task) => {
               const topic = topics.find(t => t.id === task.topicId);
               const doneRecord = {
-                id: task.id,
                 title: task.title,
                 topicId: task.topicId,
                 topicName: topic?.name || 'Unknown Topic',

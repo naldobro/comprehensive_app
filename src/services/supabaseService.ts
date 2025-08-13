@@ -394,7 +394,7 @@ export const staleTaskRecordService = {
       const { data, error } = await supabase
         .from('stale_task_records')
         .insert({
-          original_task_id: record.id, // Use the original task ID
+          original_task_id: record.title, // Use title as identifier since id is not available
           title: record.title,
           topic_id: record.topicId,
           topic_name: record.topicName,
@@ -461,7 +461,7 @@ export const doneTaskRecordService = {
       const { data, error } = await supabase
         .from('done_task_records')
         .insert({
-          original_task_id: record.id, // Use the original task ID
+          original_task_id: record.title, // Use title as identifier since id is not available
           title: record.title,
           topic_id: record.topicId,
           topic_name: record.topicName,
