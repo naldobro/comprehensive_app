@@ -7,14 +7,26 @@ export const topicService = {
     try {
       const { data, error } = await supabase
         .from('topics')
-        .select('*')
+        .select(`
+          id,
+          name,
+          color,
+          icon,
+          bio,
+          completed_tasks,
+          created_at,
+          updated_at
+        `)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
+      if (!data) return [];
+
       return data.map(topic => ({
         ...topic,
         createdAt: new Date(topic.created_at),
+        completedTasks: topic.completed_tasks || 0,
         // Ensure color is always a string
         color: topic.color || '0',
       }));
@@ -26,6 +38,8 @@ export const topicService = {
 
   async create(topic: Omit<Topic, 'id' | 'createdAt'>): Promise<Topic> {
     try {
+      console.log('Creating topic:', topic);
+      
       const { data, error } = await supabase
         .from('topics')
         .insert({
@@ -39,6 +53,8 @@ export const topicService = {
         .single();
 
       if (error) throw error;
+      
+      console.log('Topic created successfully:', data);
 
       return {
         ...data,
@@ -46,6 +62,7 @@ export const topicService = {
         completedTasks: data.completed_tasks,
       };
     } catch (error) {
+      console.error('Topic creation failed:', error);
       handleSupabaseError(error, 'create topic');
       throw error;
     }
@@ -101,10 +118,25 @@ export const taskService = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select(`
+          id,
+          title,
+          description,
+          topic_id,
+          milestone_id,
+          completed,
+          created_at,
+          completed_at,
+          completion_month,
+          completion_week,
+          completion_day,
+          updated_at
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      if (!data) return [];
 
       return data.map(task => ({
         ...task,
@@ -217,10 +249,22 @@ export const milestoneService = {
     try {
       const { data, error } = await supabase
         .from('milestones')
-        .select('*')
+        .select(`
+          id,
+          title,
+          topic_id,
+          type,
+          month,
+          week,
+          order_index,
+          created_at,
+          updated_at
+        `)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
+
+      if (!data) return [];
 
       return data.map(milestone => ({
         ...milestone,
@@ -315,10 +359,21 @@ export const staleTaskRecordService = {
     try {
       const { data, error } = await supabase
         .from('stale_task_records')
-        .select('*')
+        .select(`
+          id,
+          original_task_id,
+          title,
+          topic_id,
+          topic_name,
+          created_at,
+          stale_date,
+          archived_at
+        `)
         .order('stale_date', { ascending: false });
 
       if (error) throw error;
+
+      if (!data) return [];
 
       return data.map(record => ({
         id: record.id,
@@ -372,10 +427,20 @@ export const doneTaskRecordService = {
     try {
       const { data, error } = await supabase
         .from('done_task_records')
-        .select('*')
+        .select(`
+          id,
+          original_task_id,
+          title,
+          topic_id,
+          topic_name,
+          completed_at,
+          archived_date
+        `)
         .order('archived_date', { ascending: false });
 
       if (error) throw error;
+
+      if (!data) return [];
 
       return data.map(record => ({
         id: record.id,

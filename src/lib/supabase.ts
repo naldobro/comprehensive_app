@@ -25,13 +25,25 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 export const handleSupabaseError = (error: any, operation: string) => {
   console.error(`Supabase ${operation} error:`, error);
   
+  // Log more details for debugging
+  if (error.details) {
+    console.error('Error details:', error.details);
+  }
+  if (error.hint) {
+    console.error('Error hint:', error.hint);
+  }
+  
   // Provide more specific error messages
   if (error.code === 'PGRST116') {
     throw new Error(`Failed to ${operation}: Table or view not found. Please check your database schema.`);
   } else if (error.code === 'PGRST301') {
     throw new Error(`Failed to ${operation}: Permission denied. Please check your RLS policies.`);
+  } else if (error.code === 'PGRST103') {
+    throw new Error(`Failed to ${operation}: Invalid query syntax. Please check your query parameters.`);
   } else if (error.message?.includes('fetch')) {
     throw new Error(`Failed to ${operation}: Network error. Please check your internet connection.`);
+  } else if (error.message?.includes('JWT')) {
+    throw new Error(`Failed to ${operation}: Authentication error. Please check your Supabase keys.`);
   } else {
     throw new Error(`Failed to ${operation}: ${error.message || 'Unknown error'}`);
   }

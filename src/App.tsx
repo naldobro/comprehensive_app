@@ -55,6 +55,8 @@ function App() {
         setLoading(true);
         setError(null);
         
+        console.log('Loading initial data...');
+        
         const [topicsData, tasksData, milestonesData, staleRecordsData, doneRecordsData] = await Promise.all([
           topicService.getAll(),
           taskService.getAll(),
@@ -62,6 +64,14 @@ function App() {
           staleTaskRecordService.getAll(),
           doneTaskRecordService.getAll(),
         ]);
+        
+        console.log('Loaded data:', {
+          topics: topicsData.length,
+          tasks: tasksData.length,
+          milestones: milestonesData.length,
+          staleRecords: staleRecordsData.length,
+          doneRecords: doneRecordsData.length
+        });
         
         setTopics(topicsData);
         setTasks(tasksData);
