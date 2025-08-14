@@ -218,6 +218,52 @@ function App() {
     return () => clearInterval(checkDoneTasksInterval);
   }, [tasks, topics, loading]);
 
+  // Fix existing completion data on app load
+  useEffect(() => {
+    const fixExistingCompletionData = async () => {
+      if (loading) return;
+      
+      const tasksToFix = tasks.filter(task => 
+        task.completed && 
+        task.completedAt && 
+        (task.completionDay === undefined || task.completionWeek === undefined || task.completionMonth === undefined)
+      );
+      
+      if (tasksToFix.length === 0) return;
+      
+      console.log(`Fixing completion data for ${tasksToFix.length} tasks...`);
+      
+      try {
+        for (const task of tasksToFix) {
+          const topic = topics.find(t => t.id === task.topicId);
+          if (topic && task.completedAt) {
+            const timeContext = getTimeContextForDate(task.completedAt, topic.createdAt);
+            
+            await taskService.update(task.id, {
+              completionMonth: timeContext.currentMonth,
+              completionWeek: timeContext.currentWeek,
+              completionDay: timeContext.currentDay,
+            });
+            
+            console.log(`Fixed task "${task.title}" - Day ${timeContext.currentDay}, Week ${timeContext.currentWeek}, Month ${timeContext.currentMonth}`);
+          }
+        }
+        
+        // Reload tasks to get updated data
+        const updatedTasks = await taskService.getAll();
+        setTasks(updatedTasks);
+        
+        console.log('Completion data fix completed!');
+      } catch (error) {
+        console.error('Failed to fix completion data:', error);
+      }
+    };
+    
+    // Run the fix after a short delay to ensure everything is loaded
+    const timeoutId = setTimeout(fixExistingCompletionData, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [loading, tasks.length, topics.length]);
+
   const createTopic = async (name: string, icon: string = 'Target', colorIndex: number = 0) => {
     try {
       const newTopic = await topicService.create({
