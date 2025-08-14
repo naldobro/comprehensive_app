@@ -922,7 +922,7 @@ function App() {
         </div>
 
         {/* Archive Buttons */}
-        <div className="mb-8 flex gap-4 justify-center flex-wrap">
+        <div className="pt-12 mb-8 flex gap-4 justify-center flex-wrap">
           <button
             onClick={() => setIsStatisticsModalOpen(true)}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
