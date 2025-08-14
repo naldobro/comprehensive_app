@@ -126,7 +126,26 @@ export const TopicModal: React.FC<TopicModalProps> = ({
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0 pr-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">{topic.name}</h2>
+              <div className="mb-3">
+                <h2 className="text-2xl font-bold text-gray-900">{topic.name}</h2>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    Created: {topic.createdAt.toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </div>
+                  <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {topic.createdAt.toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
+                  </div>
+                </div>
+              </div>
               
               {/* Bio Section */}
               <div className="max-w-md">
