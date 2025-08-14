@@ -18,7 +18,7 @@ import { CreateTaskForm } from './components/CreateTaskForm';
 import { QuickStatsBar } from './components/QuickStatsBar';
 import { ProductivityInsights } from './components/ProductivityInsights';
 import { Target, CheckSquare, Clock, Archive, BarChart3 } from 'lucide-react';
-import { getCurrentTimeContext, calculateTimePosition } from './utils/timeCalculations';
+import { getCurrentTimeContext, calculateTimePosition, getTimeContextForDate } from './utils/timeCalculations';
 
 function App() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -514,7 +514,8 @@ function App() {
       let completionData = {};
       
       if (!oldTask.completed && topic) {
-        const timeContext = getCurrentTimeContext(topic.createdAt);
+        const completionDate = new Date();
+        const timeContext = getTimeContextForDate(completionDate, topic.createdAt);
         completionData = {
           completionMonth: timeContext.currentMonth,
           completionWeek: timeContext.currentWeek,

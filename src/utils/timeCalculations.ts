@@ -37,6 +37,17 @@ export const getCurrentTimeContext = (startDate: Date): TimeContext => {
   };
 };
 
+export const getTimeContextForDate = (date: Date, startDate: Date): TimeContext => {
+  const position = calculateTimePosition(date, startDate);
+  
+  return {
+    currentMonth: position.month,
+    currentWeek: position.week,
+    currentDay: position.day,
+    startDate
+  };
+};
+
 export const getDateForPosition = (month: number, week: number, day: number, startDate: Date): Date => {
   // Calculate total days from start
   const totalWeeks = (month - 1) * 4 + (week - 1);
