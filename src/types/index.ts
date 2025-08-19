@@ -45,7 +45,7 @@ export interface UndoRedoAction {
   type: 'CREATE_TOPIC' | 'DELETE_TOPIC' | 'EDIT_TOPIC' | 'REORDER_TOPICS' | 
         'CREATE_TASK' | 'DELETE_TASK' | 'EDIT_TASK' | 'TOGGLE_TASK' |
         'CREATE_MILESTONE' | 'DELETE_MILESTONE' | 'EDIT_MILESTONE' |
-        'UPDATE_BIO';
+        'UPDATE_BIO' | 'CREATE_QUOTE' | 'DELETE_QUOTE' | 'EDIT_QUOTE';
   timestamp: Date;
   data: any;
   reverseData: any;
@@ -74,4 +74,14 @@ export interface DoneTaskRecord {
   topicName: string;
   completedAt: Date;
   archivedDate: Date;
+}
+
+export interface Quote {
+  id: string;
+  text: string;
+  author?: string;
+  colorScheme: string;
+  priority: number;
+  isActive: boolean;
+  createdAt: Date;
 }

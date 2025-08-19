@@ -64,6 +64,9 @@ export const useUndoRedo = () => {
       case 'DELETE_MILESTONE': return `Delete milestone "${lastAction.reverseData.title}"`;
       case 'EDIT_MILESTONE': return `Edit milestone "${lastAction.data.title}"`;
       case 'UPDATE_BIO': return 'Update topic bio';
+      case 'CREATE_QUOTE': return `Create quote`;
+      case 'DELETE_QUOTE': return `Delete quote`;
+      case 'EDIT_QUOTE': return `Edit quote`;
       default: return 'Unknown action';
     }
   };
@@ -85,6 +88,9 @@ export const useUndoRedo = () => {
       case 'DELETE_MILESTONE': return `Delete milestone "${nextAction.reverseData.title}"`;
       case 'EDIT_MILESTONE': return `Edit milestone "${nextAction.data.title}"`;
       case 'UPDATE_BIO': return 'Update topic bio';
+      case 'CREATE_QUOTE': return `Create quote`;
+      case 'DELETE_QUOTE': return `Delete quote`;
+      case 'EDIT_QUOTE': return `Edit quote`;
       default: return 'Unknown action';
     }
   };

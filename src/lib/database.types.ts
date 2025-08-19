@@ -179,6 +179,38 @@ export interface Database {
         }
       }
     }
+    quotes: {
+      Row: {
+        id: string
+        text: string
+        author: string | null
+        color_scheme: string
+        priority: number
+        is_active: boolean
+        created_at: string
+        updated_at: string
+      }
+      Insert: {
+        id?: string
+        text: string
+        author?: string | null
+        color_scheme?: string
+        priority?: number
+        is_active?: boolean
+        created_at?: string
+        updated_at?: string
+      }
+      Update: {
+        id?: string
+        text?: string
+        author?: string | null
+        color_scheme?: string
+        priority?: number
+        is_active?: boolean
+        created_at?: string
+        updated_at?: string
+      }
+    }
     Views: {
       [_ in never]: never
     }

@@ -1,5 +1,5 @@
 import { supabase, handleSupabaseError } from '../lib/supabase';
-import { Topic, Task, Milestone, StaleTaskRecord, DoneTaskRecord } from '../types';
+import { Topic, Task, Milestone, StaleTaskRecord, DoneTaskRecord, Quote } from '../types';
 
 // Topic Services
 export const topicService = {
@@ -483,6 +483,124 @@ export const doneTaskRecordService = {
       };
     } catch (error) {
       handleSupabaseError(error, 'create done task record');
+      throw error;
+    }
+  },
+};
+
+// Quote Services
+export const quoteService = {
+  async getAll(): Promise<Quote[]> {
+    try {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select(`
+          id,
+          text,
+          author,
+          color_scheme,
+          priority,
+          is_active,
+          created_at,
+          updated_at
+        `)
+        .eq('is_active', true)
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!data) return [];
+
+      return data.map(quote => ({
+        id: quote.id,
+        text: quote.text,
+        author: quote.author || undefined,
+        colorScheme: quote.color_scheme,
+        priority: quote.priority,
+        isActive: quote.is_active,
+        createdAt: new Date(quote.created_at),
+      }));
+    } catch (error) {
+      handleSupabaseError(error, 'fetch quotes');
+      return [];
+    }
+  },
+
+  async create(quote: Omit<Quote, 'id' | 'createdAt'>): Promise<Quote> {
+    try {
+      const { data, error } = await supabase
+        .from('quotes')
+        .insert({
+          text: quote.text,
+          author: quote.author || null,
+          color_scheme: quote.colorScheme,
+          priority: quote.priority,
+          is_active: quote.isActive,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        text: data.text,
+        author: data.author || undefined,
+        colorScheme: data.color_scheme,
+        priority: data.priority,
+        isActive: data.is_active,
+        createdAt: new Date(data.created_at),
+      };
+    } catch (error) {
+      handleSupabaseError(error, 'create quote');
+      throw error;
+    }
+  },
+
+  async update(id: string, updates: Partial<Quote>): Promise<Quote> {
+    try {
+      const updateData: any = {};
+      if (updates.text !== undefined) updateData.text = updates.text;
+      if (updates.author !== undefined) updateData.author = updates.author || null;
+      if (updates.colorScheme !== undefined) updateData.color_scheme = updates.colorScheme;
+      if (updates.priority !== undefined) updateData.priority = updates.priority;
+      if (updates.isActive !== undefined) updateData.is_active = updates.isActive;
+
+      const { data, error } = await supabase
+        .from('quotes')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        text: data.text,
+        author: data.author || undefined,
+        colorScheme: data.color_scheme,
+        priority: data.priority,
+        isActive: data.is_active,
+        createdAt: new Date(data.created_at),
+      };
+    } catch (error) {
+      handleSupabaseError(error, 'update quote');
+      throw error;
+    }
+  },
+
+  async delete(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('quotes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      handleSupabaseError(error, 'delete quote');
       throw error;
     }
   },

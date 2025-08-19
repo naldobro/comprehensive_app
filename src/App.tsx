@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { topicService, taskService, milestoneService, staleTaskRecordService, doneTaskRecordService } from './services/supabaseService';
-import { Topic, Task, Milestone, StaleTaskRecord, DoneTaskRecord } from './types';
+import { topicService, taskService, milestoneService, staleTaskRecordService, doneTaskRecordService, quoteService } from './services/supabaseService';
+import { Topic, Task, Milestone, StaleTaskRecord, DoneTaskRecord, Quote } from './types';
 import { useUndoRedo } from './hooks/useUndoRedo';
 import { categorizeTasksByAge, categorizeCompletedTasksByAge } from './utils/taskAging';
 import { TopicCard } from './components/TopicCard';
@@ -17,6 +17,7 @@ import { CreateTopicForm } from './components/CreateTopicForm';
 import { CreateTaskForm } from './components/CreateTaskForm';
 import { QuickStatsBar } from './components/QuickStatsBar';
 import { ProductivityInsights } from './components/ProductivityInsights';
+import { QuotesSection } from './components/QuotesSection';
 import { Target, CheckSquare, Clock, Archive, BarChart3 } from 'lucide-react';
 import { getCurrentTimeContext, calculateTimePosition, getTimeContextForDate } from './utils/timeCalculations';
 
@@ -24,6 +25,7 @@ function App() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
@@ -56,12 +58,13 @@ function App() {
         
         console.log('Loading initial data...');
         
-        const [topicsData, tasksData, milestonesData, staleRecordsData, doneRecordsData] = await Promise.all([
+        const [topicsData, tasksData, milestonesData, staleRecordsData, doneRecordsData, quotesData] = await Promise.all([
           topicService.getAll(),
           taskService.getAll(),
           milestoneService.getAll(),
           staleTaskRecordService.getAll(),
           doneTaskRecordService.getAll(),
+          quoteService.getAll(),
         ]);
         
         console.log('Loaded data:', {
@@ -69,7 +72,8 @@ function App() {
           tasks: tasksData.length,
           milestones: milestonesData.length,
           staleRecords: staleRecordsData.length,
-          doneRecords: doneRecordsData.length
+          doneRecords: doneRecordsData.length,
+          quotes: quotesData.length
         });
         
         setTopics(topicsData);
@@ -77,6 +81,7 @@ function App() {
         setMilestones(milestonesData);
         setStaleRecords(staleRecordsData);
         setDoneRecords(doneRecordsData);
+        setQuotes(quotesData);
       } catch (err) {
         console.error('Failed to load initial data:', err);
         setError('Failed to load data. Please check your internet connection and Supabase configuration.');
@@ -563,6 +568,85 @@ function App() {
     }
   };
 
+  const createQuote = async (text: string, author: string, colorScheme: string, priority: number) => {
+    try {
+      const newQuote = await quoteService.create({
+        text,
+        author: author || undefined,
+        colorScheme,
+        priority,
+        isActive: true,
+      });
+      
+      // Add to undo stack
+      addAction({
+        id: Date.now().toString(),
+        type: 'CREATE_QUOTE',
+        timestamp: new Date(),
+        data: newQuote,
+        reverseData: null,
+      });
+      
+      setQuotes([...quotes, newQuote]);
+    } catch (error) {
+      console.error('Failed to create quote:', error);
+      setError('Failed to create quote. Please try again.');
+    }
+  };
+
+  const editQuote = async (id: string, text: string, author: string, colorScheme: string, priority: number) => {
+    try {
+      const oldQuote = quotes.find(quote => quote.id === id);
+      if (!oldQuote) return;
+      
+      const updatedQuote = await quoteService.update(id, {
+        text,
+        author: author || undefined,
+        colorScheme,
+        priority,
+      });
+      
+      // Add to undo stack
+      addAction({
+        id: Date.now().toString(),
+        type: 'EDIT_QUOTE',
+        timestamp: new Date(),
+        data: updatedQuote,
+        reverseData: oldQuote,
+      });
+      
+      setQuotes(quotes.map(quote =>
+        quote.id === id ? updatedQuote : quote
+      ));
+    } catch (error) {
+      console.error('Failed to edit quote:', error);
+      setError('Failed to edit quote. Please try again.');
+    }
+  };
+
+  const deleteQuote = async (quoteId: string) => {
+    try {
+      const quoteToDelete = quotes.find(quote => quote.id === quoteId);
+      if (!quoteToDelete) return;
+      
+      await quoteService.delete(quoteId);
+      
+      // Add to undo stack
+      addAction({
+        id: Date.now().toString(),
+        type: 'DELETE_QUOTE',
+        timestamp: new Date(),
+        data: { quoteId },
+        reverseData: quoteToDelete,
+      });
+      
+      setQuotes(quotes.filter(quote => quote.id !== quoteId));
+    } catch (error) {
+      console.error('Failed to delete quote:', error);
+      setError('Failed to delete quote. Please try again.');
+    }
+  };
+
   // Error handling component
   const ErrorBanner = () => {
     if (!error) return null;
@@ -676,6 +760,17 @@ function App() {
             : topic
         ));
         break;
+      case 'CREATE_QUOTE':
+        setQuotes(quotes.filter(quote => quote.id !== action.data.id));
+        break;
+      case 'DELETE_QUOTE':
+        setQuotes([...quotes, action.reverseData]);
+        break;
+      case 'EDIT_QUOTE':
+        setQuotes(quotes.map(quote => 
+          quote.id === action.reverseData.id ? action.reverseData : quote
+        ));
+        break;
     }
   };
 
@@ -744,6 +839,17 @@ function App() {
             : topic
         ));
         break;
+      case 'CREATE_QUOTE':
+        setQuotes([...quotes, action.data]);
+        break;
+      case 'DELETE_QUOTE':
+        setQuotes(quotes.filter(quote => quote.id !== action.data.quoteId));
+        break;
+      case 'EDIT_QUOTE':
+        setQuotes(quotes.map(quote => 
+          quote.id === action.data.id ? action.data : quote
+        ));
+        break;
     }
   };
   const openTopicModal = (topic: Topic) => {
@@ -798,6 +904,14 @@ function App() {
 
         {/* Topics Section */}
         <div className="mb-8">
+          {/* Quotes Section */}
+          <QuotesSection
+            quotes={quotes}
+            onCreateQuote={createQuote}
+            onEditQuote={editQuote}
+            onDeleteQuote={deleteQuote}
+          />
+          
           {/* Quick Stats Bar */}
           <QuickStatsBar
             topics={topics}
@@ -862,7 +976,7 @@ function App() {
                 Fresh Tasks ({freshPendingTasks.length})
               </h2>
             </div>
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+            <div className="space-y-3">
               {freshPendingTasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Clock size={48} className="mx-auto mb-4 text-gray-300" />
@@ -894,7 +1008,7 @@ function App() {
                 Completed Tasks ({completedTasks.length})
               </h2>
             </div>
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+            <div className="space-y-3">
               {completedTasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <CheckSquare size={48} className="mx-auto mb-4 text-gray-300" />
@@ -922,7 +1036,7 @@ function App() {
         </div>
 
         {/* Archive Buttons */}
-        <div className="pt-12 mb-8 flex gap-4 justify-center flex-wrap">
+        <div className="mb-8 flex gap-4 justify-center flex-wrap">
           <button
             onClick={() => setIsStatisticsModalOpen(true)}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
