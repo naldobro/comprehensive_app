@@ -64,9 +64,9 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
   }
 
   return (
-    <div className={`group bg-gradient-to-r ${colorScheme.bg} border ${colorScheme.border} rounded-lg p-3 min-w-[180px] hover:shadow-md transition-all duration-200`}>
+    <div className={`group bg-gradient-to-r ${colorScheme.bg} border ${colorScheme.border} rounded-lg p-3 min-w-fit hover:shadow-md transition-all duration-200 flex-shrink-0`}>
       <div className="flex items-center justify-between mb-1">
-        <h4 className={`font-medium ${colorScheme.text} text-sm truncate pr-2`}>
+        <h4 className={`font-medium ${colorScheme.text} text-sm pr-2 whitespace-nowrap`}>
           {milestone.title}
         </h4>
         {!readonly && (

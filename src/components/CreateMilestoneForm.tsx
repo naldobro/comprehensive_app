@@ -25,7 +25,7 @@ export const CreateMilestoneForm: React.FC<CreateMilestoneFormProps> = ({ onCrea
 
   if (isCreating) {
     return (
-      <div className="bg-white border border-gray-300 rounded-lg p-3 min-w-[180px]">
+      <div className="bg-white border border-gray-300 rounded-lg p-3 min-w-[180px] flex-shrink-0">
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -58,7 +58,7 @@ export const CreateMilestoneForm: React.FC<CreateMilestoneFormProps> = ({ onCrea
   return (
     <button
       onClick={() => setIsCreating(true)}
-      className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-3 min-w-[180px] flex items-center justify-center gap-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+      className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-3 min-w-[180px] flex items-center justify-center gap-2 text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 flex-shrink-0"
     >
       <Plus size={16} />
       <span className="text-sm font-medium">Add Milestone</span>
