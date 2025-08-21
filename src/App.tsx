@@ -8,6 +8,7 @@ import { TopicCard } from './components/TopicCard';
 import { TaskItem } from './components/TaskItem';
 import { UndoRedoControls } from './components/UndoRedoControls';
 import { StaleTasksSection } from './components/StaleTasksSection';
+import { FreshTasksSection } from './components/FreshTasksSection';
 import { StaleTasksModal } from './components/StaleTasksModal';
 import { DoneTasksModal } from './components/DoneTasksModal';
 import { StatisticsModal } from './components/StatisticsModal';
@@ -967,41 +968,18 @@ function App() {
         />
 
         {/* Tasks Sections */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Pending Tasks */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="text-amber-600" size={20} />
-              <h2 className="text-xl font-semibold text-gray-900">
-                Fresh Tasks ({freshPendingTasks.length})
-              </h2>
-            </div>
-            <div className="space-y-3">
-              {freshPendingTasks.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Clock size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>No fresh tasks</p>
-                </div>
-              ) : (
-                freshPendingTasks.map(task => {
-                  const taskTopic = topics.find(topic => topic.id === task.topicId);
-                  return taskTopic ? (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      topic={taskTopic}
-                      onToggleComplete={toggleTaskComplete}
-                      onEditTask={editTask}
-                      onDeleteTask={deleteTask}
-                    />
-                  ) : null;
-                })
-              )}
-            </div>
-          </div>
+        {/* Fresh Tasks Section with 3-column layout */}
+        <FreshTasksSection
+          freshTasks={freshPendingTasks}
+          topics={topics}
+          onToggleComplete={toggleTaskComplete}
+          onEditTask={editTask}
+          onDeleteTask={deleteTask}
+        />
 
+        <div className="grid lg:grid-cols-1 gap-8">
           {/* Completed Tasks */}
-          <div>
+          <div className="max-h-[500px] overflow-y-auto">
             <div className="flex items-center gap-2 mb-4">
               <CheckSquare className="text-green-600" size={20} />
               <h2 className="text-xl font-semibold text-gray-900">
@@ -1036,7 +1014,7 @@ function App() {
         </div>
 
         {/* Archive Buttons */}
-        <div className="mb-8 flex gap-4 justify-center flex-wrap">
+        <div className="mb-8 pt-12 flex gap-4 justify-center flex-wrap">
           <button
             onClick={() => setIsStatisticsModalOpen(true)}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
