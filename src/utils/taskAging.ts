@@ -2,20 +2,33 @@ import { Task } from '../types';
 
 export const STALE_TASK_DAYS = 3;
 
+// Helper function to get the start of a day
+const getStartOfDay = (date: Date): Date => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  return startOfDay;
+};
+
+// Helper function to get days difference based on calendar days, not hours
+const getCalendarDaysDifference = (date1: Date, date2: Date): number => {
+  const start = getStartOfDay(date1);
+  const end = getStartOfDay(date2);
+  const diffTime = end.getTime() - start.getTime();
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
 export const isTaskStale = (task: Task): boolean => {
   if (task.completed) return false;
   
   const now = new Date();
-  const taskAge = now.getTime() - task.createdAt.getTime();
-  const daysOld = taskAge / (1000 * 60 * 60 * 24);
+  const daysOld = getCalendarDaysDifference(task.createdAt, now);
   
   return daysOld >= STALE_TASK_DAYS;
 };
 
 export const getTaskAge = (task: Task): number => {
   const now = new Date();
-  const taskAge = now.getTime() - task.createdAt.getTime();
-  return Math.floor(taskAge / (1000 * 60 * 60 * 24));
+  return getCalendarDaysDifference(task.createdAt, now);
 };
 
 export const formatTaskAge = (days: number): string => {
@@ -43,8 +56,7 @@ export const isTaskOldCompleted = (task: Task): boolean => {
   if (!task.completed || !task.completedAt) return false;
   
   const now = new Date();
-  const completedAge = now.getTime() - task.completedAt.getTime();
-  const daysOld = completedAge / (1000 * 60 * 60 * 24);
+  const daysOld = getCalendarDaysDifference(task.completedAt, now);
   
   return daysOld >= 7;
 };

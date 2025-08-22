@@ -18,7 +18,22 @@ export const FreshTasksSection: React.FC<FreshTasksSectionProps> = ({
   onEditTask,
   onDeleteTask,
 }) => {
-  // Categorize tasks by age in days
+  // Helper function to get the start of a day
+  const getStartOfDay = (date: Date): Date => {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    return startOfDay;
+  };
+
+  // Helper function to get calendar days difference
+  const getCalendarDaysDifference = (createdDate: Date, currentDate: Date): number => {
+    const start = getStartOfDay(createdDate);
+    const end = getStartOfDay(currentDate);
+    const diffTime = end.getTime() - start.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  // Categorize tasks by calendar days (real-time based)
   const categorizeTasksByDays = (tasks: Task[]) => {
     const now = new Date();
     const day1: Task[] = []; // Today (0-24 hours old)
@@ -26,14 +41,13 @@ export const FreshTasksSection: React.FC<FreshTasksSectionProps> = ({
     const day3: Task[] = []; // Day before yesterday (48-72 hours old)
 
     tasks.forEach(task => {
-      const taskAge = now.getTime() - task.createdAt.getTime();
-      const hoursOld = taskAge / (1000 * 60 * 60);
+      const daysOld = getCalendarDaysDifference(task.createdAt, now);
       
-      if (hoursOld < 24) {
+      if (daysOld === 0) {
         day1.push(task);
-      } else if (hoursOld < 48) {
+      } else if (daysOld === 1) {
         day2.push(task);
-      } else if (hoursOld < 72) {
+      } else if (daysOld === 2) {
         day3.push(task);
       }
     });

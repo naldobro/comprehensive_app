@@ -2,23 +2,30 @@ import React from 'react';
 import { useState } from 'react';
 import { Task } from '../types';
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatDate } from '../utils/timeCalculations';
+import { formatDate, getCurrentTimeContext } from '../utils/timeCalculations';
 
 interface WeeklyTaskGridProps {
   tasks: Task[];
   weekDates: Date[];
   month: number;
   week: number;
+  topicCreatedAt: Date;
 }
 
 export const WeeklyTaskGrid: React.FC<WeeklyTaskGridProps> = ({ 
   tasks, 
   weekDates, 
   month, 
-  week 
+  week,
+  topicCreatedAt
 }) => {
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Calculate current day in topic's timeline
+  const currentTimeContext = getCurrentTimeContext(topicCreatedAt);
+  const isCurrentWeek = month === currentTimeContext.currentMonth && week === currentTimeContext.currentWeek;
+  const currentDayInWeek = isCurrentWeek ? currentTimeContext.currentDay : null;
 
   // Check if mobile on mount and resize
   React.useEffect(() => {
@@ -70,7 +77,12 @@ export const WeeklyTaskGrid: React.FC<WeeklyTaskGridProps> = ({
             
             <div className="text-center">
               <div className="font-semibold text-gray-900 text-lg">Day {currentDay}</div>
-              <div className="text-sm text-gray-500">{formatDate(weekDates[currentDayIndex])}</div>
+              <div className={`text-sm ${currentDayInWeek === currentDay ? 'text-blue-600 font-semibold' : 'text-gray-500'}`}>
+                {formatDate(weekDates[currentDayIndex])}
+                {currentDayInWeek === currentDay && (
+                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Today</span>
+                )}
+              </div>
             </div>
             
             <button
@@ -152,9 +164,22 @@ export const WeeklyTaskGrid: React.FC<WeeklyTaskGridProps> = ({
       {/* Header */}
       <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
         {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-          <div key={day} className="p-4 text-center border-r border-gray-200 last:border-r-0">
-            <div className="font-semibold text-gray-900 mb-1">Day {day}</div>
-            <div className="text-xs text-gray-500">{formatDate(weekDates[day - 1])}</div>
+          <div key={day} className={`p-4 text-center border-r border-gray-200 last:border-r-0 ${
+            currentDayInWeek === day ? 'bg-blue-50 border-blue-200' : ''
+          }`}>
+            <div className={`font-semibold mb-1 ${
+              currentDayInWeek === day ? 'text-blue-900' : 'text-gray-900'
+            }`}>
+              Day {day}
+              {currentDayInWeek === day && (
+                <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto mt-1"></div>
+              )}
+            </div>
+            <div className={`text-xs ${
+              currentDayInWeek === day ? 'text-blue-600 font-medium' : 'text-gray-500'
+            }`}>
+              {formatDate(weekDates[day - 1])}
+            </div>
           </div>
         ))}
       </div>
@@ -163,9 +188,12 @@ export const WeeklyTaskGrid: React.FC<WeeklyTaskGridProps> = ({
       <div className="grid grid-cols-7 min-h-[200px]">
         {[1, 2, 3, 4, 5, 6, 7].map((day) => {
           const dayTasks = tasksByDay[day] || [];
+          const isCurrentDay = currentDayInWeek === day;
           
           return (
-            <div key={day} className="p-3 border-r border-gray-200 last:border-r-0 space-y-2">
+            <div key={day} className={`p-3 border-r border-gray-200 last:border-r-0 space-y-2 ${
+              isCurrentDay ? 'bg-blue-50/30' : ''
+            }`}>
               {dayTasks.length === 0 ? (
                 <div className="text-center text-gray-400 py-8">
                   <CheckCircle size={24} className="mx-auto mb-2 opacity-30" />
@@ -175,7 +203,11 @@ export const WeeklyTaskGrid: React.FC<WeeklyTaskGridProps> = ({
                 dayTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="bg-green-50 border border-green-200 rounded-lg p-2 hover:bg-green-100 transition-colors"
+                    className={`border rounded-lg p-2 hover:bg-green-100 transition-colors ${
+                      isCurrentDay 
+                        ? 'bg-green-100 border-green-300 shadow-sm' 
+                        : 'bg-green-50 border-green-200'
+                    }`}
                   >
                     <div className="flex items-start gap-2">
                       <CheckCircle size={14} className="text-green-500 flex-shrink-0 mt-0.5" />

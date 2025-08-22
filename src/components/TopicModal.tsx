@@ -323,6 +323,7 @@ export const TopicModal: React.FC<TopicModalProps> = ({
               weekDates={weekDates}
               month={currentViewMonth}
               week={currentViewWeek}
+              topicCreatedAt={topic.createdAt}
             />
           </div>
         </div>
